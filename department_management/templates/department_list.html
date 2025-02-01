@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Department List</title>
+    <style>
+        /* Center the content and table */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            padding-left: 20px; /* Add padding to the left side */
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        /* Style for the "Create New Department" link */
+        .create-link {
+            text-decoration: none;
+            color: white;
+            background-color: green;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            margin-left: 0;
+            align-self: flex-start; /* Align to the left of the page */
+            margin-top: 40px;
+            margin-left: 60px;
+        }
+
+        .create-link:hover {
+            background-color: darkgreen;
+        }
+
+        /* Style the table */
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Style the Edit button */
+        .btn-edit {
+            background-color: yellow;
+            color: black;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .btn-edit:hover {
+            background-color: #f4e542;
+        }
+
+        /* Style the Delete button */
+        .btn-delete {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    {% if user.is_superuser %}
+        <a href="{% url 'department_create' %}" class="create-link">Create Department</a>
+    {% endif %}
+    <form method="get" action="{% url 'department_list' %}">
+        <input type="text" name="search" placeholder="Search Departments" value="{{ request.GET.search }}">
+        <button type="submit">Search</button>
+    </form>
+   
+    <table>
+        <tr>
+            <th>Sr.No</th>
+            <th>Department Name</th>
+            <th>Description</th>
+            {% if user.is_superuser %}
+                <th>Edit</th>
+                <th>Delete</th>
+            {% endif %}
+        </tr>
+        {% for department in departments %}
+            <tr>
+                <td>{{ department.dept_id }}</td>
+                <td>{{ department.name }}</td>
+                <td>{{ department.description }}</td>
+                {% if user.is_superuser %}
+                    <td><a href="{% url 'department_update' department.dept_id %}" class="btn-edit">Edit</a></td>
+                    <td>
+                        <form action="{% url 'department_delete' department.dept_id %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" value="Delete" class="btn-delete">
+                        </form>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
